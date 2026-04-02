@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { format, isToday, isAfter, addDays, isBefore, parseISO } from 'date-fns';
 import { tr } from 'date-fns/locale';
-import { AlertCircle, Calendar as CalendarIcon, CheckCircle2, Clock, Plus, Sparkles } from 'lucide-react';
+import { AlertCircle, Calendar as CalendarIcon, CheckCircle2, Clock, Plus, Sparkles, Copy } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { TaskStatus, ContentType, Task } from '../types';
 import TaskModal from '../components/TaskModal';
 import AIContentModal from '../components/AIContentModal';
+import QuickStatusSelector from '../components/QuickStatusSelector';
 
 const statusColors: Record<TaskStatus, string> = {
   'Planlandı': 'bg-yellow-100 text-yellow-700 border-yellow-200',
@@ -62,19 +63,19 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
         {/* Today's Tasks */}
-        <section className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-indigo-600" />
+        <section className="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between mb-4 md:mb-6">
+            <h2 className="text-base md:text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <Clock className="w-5 h-5 text-indigo-600 shrink-0" />
               Bugün
             </h2>
-            <span className="text-xs font-medium px-2 py-1 bg-gray-100 text-gray-600 rounded-full">
+            <span className="text-[10px] md:text-xs font-medium px-2 py-1 bg-gray-100 text-gray-600 rounded-full shrink-0">
               {todayTasks.length} görev
             </span>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4">
             {todayTasks.length > 0 ? (
               todayTasks.map(task => (
                 <TaskItem 
@@ -93,17 +94,17 @@ export default function Dashboard() {
         </section>
 
         {/* Upcoming Tasks */}
-        <section className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <CalendarIcon className="w-5 h-5 text-blue-600" />
+        <section className="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between mb-4 md:mb-6">
+            <h2 className="text-base md:text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <CalendarIcon className="w-5 h-5 text-blue-600 shrink-0" />
               Gelecek 7 Gün
             </h2>
-            <span className="text-xs font-medium px-2 py-1 bg-gray-100 text-gray-600 rounded-full">
+            <span className="text-[10px] md:text-xs font-medium px-2 py-1 bg-gray-100 text-gray-600 rounded-full shrink-0">
               {upcomingTasks.length} görev
             </span>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4">
             {upcomingTasks.length > 0 ? (
               upcomingTasks.map(task => (
                 <TaskItem 
@@ -123,17 +124,17 @@ export default function Dashboard() {
         </section>
 
         {/* Overdue Tasks */}
-        <section className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-red-600" />
+        <section className="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between mb-4 md:mb-6">
+            <h2 className="text-base md:text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
               Gecikenler
             </h2>
-            <span className="text-xs font-medium px-2 py-1 bg-red-50 text-red-600 rounded-full">
+            <span className="text-[10px] md:text-xs font-medium px-2 py-1 bg-red-50 text-red-600 rounded-full shrink-0">
               {overdueTasks.length} görev
             </span>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4">
             {overdueTasks.length > 0 ? (
               overdueTasks.map(task => (
                 <TaskItem 
@@ -155,34 +156,34 @@ export default function Dashboard() {
       </div>
 
       {/* Clients Overview */}
-      <section className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">Müşteri Özeti</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section className="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-4 md:mb-6">Müşteri Özeti</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {clients.map(client => {
             const clientTasks = tasks.filter(t => t.clientId === client.id);
             const publishedCount = clientTasks.filter(t => t.status === 'Yayınlandı').length;
             const progress = Math.min(100, Math.round((publishedCount / (client.monthlyTargets.posts + client.monthlyTargets.reels + client.monthlyTargets.stories)) * 100));
 
             return (
-              <div key={client.id} className="p-4 border border-gray-100 rounded-lg hover:border-indigo-200 transition-colors group">
-                <div className="flex items-center gap-3 mb-4">
+              <div key={client.id} className="p-3 md:p-4 border border-gray-100 rounded-lg hover:border-indigo-200 transition-colors group overflow-hidden">
+                <div className="flex items-center gap-3 mb-3 md:mb-4">
                   <div 
-                    className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
+                    className="w-8 h-8 md:w-10 md:h-10 rounded-lg flex items-center justify-center text-white font-bold shrink-0 text-sm md:text-base"
                     style={{ backgroundColor: client.brandColor }}
                   >
                     {client.name.charAt(0)}
                   </div>
-                  <div>
-                    <h3 className="font-medium text-gray-900 group-hover:text-indigo-600 transition-colors">{client.name}</h3>
-                    <p className="text-xs text-gray-500">{clientTasks.length} toplam görev</p>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-medium text-gray-900 group-hover:text-indigo-600 transition-colors truncate text-sm md:text-base">{client.name}</h3>
+                    <p className="text-[10px] md:text-xs text-gray-500 truncate">{clientTasks.length} toplam görev</p>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs font-medium">
+                <div className="space-y-1.5 md:space-y-2">
+                  <div className="flex justify-between text-[10px] md:text-xs font-medium">
                     <span className="text-gray-500">Aylık İlerleme</span>
                     <span className="text-indigo-600">%{progress}</span>
                   </div>
-                  <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-gray-100 h-1 md:h-1.5 rounded-full overflow-hidden">
                     <div 
                       className="bg-indigo-600 h-full rounded-full transition-all duration-500" 
                       style={{ width: `${progress}%` }}
@@ -209,32 +210,51 @@ export default function Dashboard() {
 }
 
 function TaskItem({ task, showDate = false, isOverdue = false, onClick }: { task: any, showDate?: boolean, isOverdue?: boolean, onClick?: () => void, key?: any }) {
-  const { clients } = useApp();
+  const { clients, updateTask, duplicateTask } = useApp();
   const client = clients.find(c => c.id === task.clientId);
 
   return (
     <div 
       onClick={onClick}
-      className="group p-3 border border-gray-50 rounded-lg hover:bg-gray-50 hover:border-gray-200 transition-all cursor-pointer"
+      className="group p-3 border border-gray-50 rounded-lg hover:bg-gray-50 hover:border-gray-200 transition-all cursor-pointer relative overflow-hidden"
     >
-      <div className="flex justify-between items-start mb-1">
-        <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider">{task.type}</span>
-        {showDate && (
-          <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded", isOverdue ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-500")}>
-            {format(parseISO(task.date), 'd MMMM', { locale: tr })}
-          </span>
-        )}
+      <div className="flex justify-between items-start mb-1 gap-2">
+        <span className="text-[10px] md:text-xs font-bold text-indigo-600 uppercase tracking-wider shrink-0">{task.type}</span>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {showDate && (
+            <span className={cn("text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 rounded uppercase", isOverdue ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-500")}>
+              {format(parseISO(task.date), 'd MMM', { locale: tr })}
+            </span>
+          )}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              duplicateTask(task.id);
+            }}
+            title="Kopyala"
+            className="p-1 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
+          >
+            <Copy className="w-3 h-3" />
+          </button>
+        </div>
       </div>
-      <h4 className="text-sm font-medium text-gray-900 line-clamp-1 group-hover:text-indigo-600 transition-colors">{task.title}</h4>
+      <h4 className="text-sm font-bold text-gray-900 line-clamp-1 group-hover:text-indigo-600 transition-colors pr-6">{task.title}</h4>
       <div className="flex items-center gap-2 mt-2">
         <div 
-          className="w-2 h-2 rounded-full" 
+          className="w-2 h-2 rounded-full shrink-0" 
           style={{ backgroundColor: client?.brandColor }}
         />
-        <span className="text-xs text-gray-500">{client?.name}</span>
-        <span className={cn("ml-auto text-[10px] px-2 py-0.5 rounded-full border", statusColors[task.status as TaskStatus])}>
-          {task.status}
-        </span>
+        <span className="text-[10px] md:text-xs text-gray-500 truncate max-w-[80px] md:max-w-[120px]">{client?.name}</span>
+        <div className="ml-auto flex items-center gap-1.5">
+          <QuickStatusSelector
+            currentStatus={task.status}
+            onStatusChange={(newStatus) => updateTask({ ...task, status: newStatus })}
+            className="hidden group-hover:flex"
+          />
+          <span className={cn("text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 rounded-full border shrink-0 uppercase tracking-tighter md:tracking-normal", statusColors[task.status as TaskStatus])}>
+            {task.status}
+          </span>
+        </div>
       </div>
     </div>
   );

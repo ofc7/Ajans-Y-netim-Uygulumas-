@@ -6,14 +6,22 @@ import { Client } from '../types';
 import ClientModal from '../components/ClientModal';
 
 export default function ClientsPage() {
-  const { clients, tasks } = useApp();
+  const { clients, tasks, deleteClient } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | undefined>(undefined);
+  const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
 
   const filteredClients = clients.filter(c => 
     c.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleDeleteClient = () => {
+    if (clientToDelete) {
+      deleteClient(clientToDelete.id);
+      setClientToDelete(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -117,7 +125,10 @@ export default function ClientsPage() {
                     <Edit2 className="w-4 h-4" />
                     Düzenle
                   </button>
-                  <button className="px-3 py-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                  <button 
+                    onClick={() => setClientToDelete(client)}
+                    className="px-3 py-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -126,6 +137,42 @@ export default function ClientsPage() {
           );
         })}
       </div>
+
+      {clientToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center gap-4 mb-4 text-red-600">
+              <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Müşteriyi Sil</h3>
+                <p className="text-sm text-gray-500">Bu işlem geri alınamaz.</p>
+              </div>
+            </div>
+            
+            <p className="text-gray-600 mb-6">
+              <span className="font-bold">{clientToDelete.name}</span> isimli müşteriyi silmek istediğinize emin misiniz? 
+              Bu müşteriye ait tüm görevler de silinecektir.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setClientToDelete(null)}
+                className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                Vazgeç
+              </button>
+              <button
+                onClick={handleDeleteClient}
+                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+              >
+                Evet, Sil
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ClientModal 
         isOpen={isClientModalOpen} 

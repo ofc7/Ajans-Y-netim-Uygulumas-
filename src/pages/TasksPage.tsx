@@ -79,81 +79,144 @@ export default function TasksPage() {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[800px]">
-          <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Görev</th>
-              <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Müşteri</th>
-              <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Tarih</th>
-              <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Atanan</th>
-              <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Durum</th>
-              <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider"></th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {filteredTasks.map(task => {
-              const client = clients.find(c => c.id === task.clientId);
-              const assignedUsers = users.filter(u => task.assignedStaff.includes(u.id));
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[800px]">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Görev</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Müşteri</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Tarih</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Atanan</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Durum</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filteredTasks.map(task => {
+                const client = clients.find(c => c.id === task.clientId);
+                const assignedUsers = users.filter(u => task.assignedStaff.includes(u.id));
 
-              return (
-                <tr 
-                  key={task.id} 
-                  onClick={() => {
-                    setSelectedTask(task);
-                    setIsTaskModalOpen(true);
-                  }}
-                  className="hover:bg-gray-50/50 transition-colors group cursor-pointer"
-                >
-                  <td className="px-6 py-4">
-                    <div className="flex flex-col">
-                      <span className="text-xs font-bold text-indigo-600 uppercase mb-0.5">{task.type}</span>
-                      <span className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{task.title}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <div 
-                        className="w-2 h-2 rounded-full" 
-                        style={{ backgroundColor: client?.brandColor }}
-                      />
-                      <span className="text-sm text-gray-600">{client?.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-gray-500">
-                      <Calendar className="w-4 h-4" />
-                      <span className="text-sm">{format(parseISO(task.date), 'd MMM yyyy', { locale: tr })}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex -space-x-2 overflow-hidden">
-                      {assignedUsers.map(user => (
-                        <img 
-                          key={user.id}
-                          className="inline-block h-8 w-8 rounded-full ring-2 ring-white"
-                          src={user.avatar}
-                          alt={user.name}
-                          title={user.name}
+                return (
+                  <tr 
+                    key={task.id} 
+                    onClick={() => {
+                      setSelectedTask(task);
+                      setIsTaskModalOpen(true);
+                    }}
+                    className="hover:bg-gray-50/50 transition-colors group cursor-pointer"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold text-indigo-600 uppercase mb-0.5">{task.type}</span>
+                        <span className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{task.title}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-2 h-2 rounded-full" 
+                          style={{ backgroundColor: client?.brandColor }}
                         />
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={cn("text-[10px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wide", statusColors[task.status as TaskStatus])}>
-                      {task.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                      <MoreHorizontal className="w-5 h-5" />
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                        <span className="text-sm text-gray-600">{client?.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2 text-gray-500">
+                        <Calendar className="w-4 h-4" />
+                        <span className="text-sm">{format(parseISO(task.date), 'd MMM yyyy', { locale: tr })}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex -space-x-2 overflow-hidden">
+                        {assignedUsers.map(user => (
+                          <img 
+                            key={user.id}
+                            className="inline-block h-8 w-8 rounded-full ring-2 ring-white"
+                            src={user.avatar}
+                            alt={user.name}
+                            title={user.name}
+                          />
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={cn("text-[10px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wide", statusColors[task.status as TaskStatus])}>
+                        {task.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                        <MoreHorizontal className="w-5 h-5" />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="md:hidden divide-y divide-gray-100">
+          {filteredTasks.map(task => {
+            const client = clients.find(c => c.id === task.clientId);
+            const assignedUsers = users.filter(u => task.assignedStaff.includes(u.id));
+
+            return (
+              <div 
+                key={task.id}
+                onClick={() => {
+                  setSelectedTask(task);
+                  setIsTaskModalOpen(true);
+                }}
+                className="p-4 space-y-3 active:bg-gray-50 transition-colors"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">{task.type}</span>
+                    <h3 className="text-sm font-bold text-gray-900">{task.title}</h3>
+                  </div>
+                  <span className={cn("text-[9px] font-bold px-2 py-0.5 rounded-full border uppercase", statusColors[task.status as TaskStatus])}>
+                    {task.status}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="w-2 h-2 rounded-full" 
+                      style={{ backgroundColor: client?.brandColor }}
+                    />
+                    <span>{client?.name}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    <span>{format(parseISO(task.date), 'd MMM', { locale: tr })}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-1">
+                  <div className="flex -space-x-1.5 overflow-hidden">
+                    {assignedUsers.map(user => (
+                      <img 
+                        key={user.id}
+                        className="inline-block h-6 w-6 rounded-full ring-2 ring-white"
+                        src={user.avatar}
+                        alt={user.name}
+                      />
+                    ))}
+                  </div>
+                  <button className="p-1.5 text-gray-400">
+                    <MoreHorizontal className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
         {filteredTasks.length === 0 && (
           <div className="py-12 text-center">
             <p className="text-gray-500">Kriterlere uygun görev bulunamadı.</p>
